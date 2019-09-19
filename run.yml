@@ -1,0 +1,41 @@
+#
+# Flight Deck entrypoint
+#
+# This is an Ansible playbook Flight Deck will run on container
+# startup. Here, you can add whatever special steps you need to
+# run when the container starts up. This is the best place for
+# credentials as in k8s, these are mounted at runtime.
+#
+# Flight Deck will also look for a YAML "extra vars" file to
+# pass to this playbook at: /config/web/flight-deck-web.yml
+#
+---
+- hosts: flight-deck-web
+  roles:
+    # Sets up the container internally.
+    - flight-deck-web-run
+  tasks:
+    - name: Update $databases in settings.php
+      lineinfile:
+        dest: "/var/www/html/sites/default/settings.php"
+        regexp: "^\\$databases = \\[\\];"
+        line: |
+          $databases['default']['default'] = [
+            'database' => '{{ MYSQL_NAME }}',
+            'username' => '{{ MYSQL_USER }}',
+            'password' => '{{ MYSQL_PASS }}',
+            'prefix' => '',
+            'host' => '{{ MYSQL_HOST | default('mysql-0.mysql') }}',
+            'port' => '{{ MYSQL_PORT | default('3306') }}',
+            'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',
+            'driver' => 'mysql',
+          ];
+      when:
+        - MYSQL_NAME is defined
+        - MYSQL_USER is defined
+        - MYSQL_PASS is defined
+    - name: Update $config_directories in settings.php
+      lineinfile:
+        dest: "/var/www/html/sites/default/settings.php"
+        regexp: "^\\$config_directories = \\[\\];"
+        line: "$config_directories[CONFIG_SYNC_DIRECTORY] = '../config/sync';"
