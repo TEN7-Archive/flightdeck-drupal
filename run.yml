@@ -15,6 +15,24 @@
     # Sets up the container internally.
     - flight-deck-web-run
   tasks:
+    # Grab key configurations from files.
+    - name: Get the database name from file, if provided.
+      set_fact:
+        MYSQL_NAME: "{{ lookup('file', MYSQL_NAME_FILE, errors='strict') }}"
+      when:
+        - MYSQL_NAME_FILE is defined
+    - name: Get the username from file, if provided.
+      set_fact:
+        MYSQL_USER: "{{ lookup('file', MYSQL_USER_FILE, errors='strict') }}"
+      when:
+        - MYSQL_USER_FILE is defined
+    - name: Get the password from file, if provided.
+      set_fact:
+        MYSQL_PASS: "{{ lookup('file', MYSQL_PASS_FILE, errors='strict') }}"
+      when:
+        - MYSQL_PASS_FILE is defined
+
+    # Configure Drupal.
     - name: Update $databases in settings.php
       lineinfile:
         dest: "/var/www/html/sites/default/settings.php"
