@@ -31,6 +31,11 @@
         MYSQL_PASS: "{{ lookup('file', MYSQL_PASS_FILE, errors='strict') }}"
       when:
         - MYSQL_PASS_FILE is defined
+    - name: Get the hash salt from file, if provided.
+      set_fact:
+        HASH_SALT: "{{ lookup('file', MYSQL_PASS_FILE, errors='strict') }}"
+      when:
+        - HASH_SALT_FILE is defined
 
     # Configure Drupal.
     - name: Update $databases in settings.php
@@ -57,3 +62,10 @@
         dest: "/var/www/html/sites/default/settings.php"
         regexp: "^\\$config_directories = \\[\\];"
         line: "$config_directories[CONFIG_SYNC_DIRECTORY] = '../config/sync';"
+    - name: Update hash salt in settings.php
+      lineinfile:
+        dest: "/var/www/html/sites/default/settings.php"
+        regexp: "^\\$settings = \\[\\'hash_salt\\'\\] = \\'\\';"
+        line: "$settings['hash_salt'] = '{{ _hash_salt | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}';"
+      vars:
+        _hash_salt: "{{ HASH_SALT | default('averybadsalt') }}"
