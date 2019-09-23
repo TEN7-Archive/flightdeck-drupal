@@ -65,7 +65,7 @@
     - name: Update hash salt in settings.php
       lineinfile:
         dest: "/var/www/html/sites/default/settings.php"
-        regexp: "^\\$settings = \\[\\'hash_salt\\'\\] = \\'\\';"
-        line: "$settings['hash_salt'] = '{{ _hash_salt | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}';"
+        regexp: "^\\$settings\\[\\'hash_salt\\'\\] = \\'\\';"
+        line: "$settings['hash_salt'] = '{{ HASH_SALT | default(_default_hash_salt) }}';"
       vars:
-        _hash_salt: "{{ HASH_SALT | default('averybadsalt') }}"
+        _default_hash_salt: "{{ 'averybadsalt' | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
