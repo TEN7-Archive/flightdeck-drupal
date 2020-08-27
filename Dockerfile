@@ -1,4 +1,4 @@
-FROM ten7/flight-deck-web:develop
+FROM ten7/flight-deck-web:7.4
 
 # Switch to root for the build.
 USER root
@@ -19,7 +19,7 @@ USER apache
 # build processes such as composer and gulp. You do *not* bake in
 # credentials here. That should be done in run.yml!
 #
-RUN git clone --branch 8.7.x --depth 1 https://git.drupalcode.org/project/drupal.git /var/www/html && \
+RUN git clone --branch 8.9.x --depth 1 https://git.drupalcode.org/project/drupal.git /var/www/html && \
     rm -rf /var/www/html/.git && \
     composer --working-dir=/var/www/html install && \
     mkdir -m 755 -p /var/www/files /var/www/config/sync && \
