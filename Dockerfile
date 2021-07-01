@@ -23,9 +23,11 @@ RUN composer create-project drupal/recommended-project:9.2.0 /tmp/drupal && \
     mv /tmp/drupal/composer* /var/www/ && \
     mv /tmp/drupal/vendor /var/www/ && \
     mv /tmp/drupal/web /var/www/ && \
-    composer --working-dir=/var/www install && \
-    mkdir -m 755 -p /var/www/files /var/www/config/sync && \
+    composer --working-dir=/var/www --no-cache require drush/drush && \
+    composer --working-dir=/var/www --no-cache install && \
+    mkdir -m 755 -p /var/www/files /var/www/config/sync /var/www/contrib-modules && \
     ln -sfn /var/www/files /var/www/web/sites/default/files && \
+    ln -sfn /var/www/contrib-modules /var/www/web/modules/contrib && \
     cp /var/www/web/sites/default/default.settings.php /var/www/web/sites/default/settings.php && \
     chmod +w /var/www/web/sites/default/settings.php && \
     rm -rf /tmp/* /var/www/html
