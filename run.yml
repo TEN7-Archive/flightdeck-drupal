@@ -40,7 +40,7 @@
     # Configure Drupal.
     - name: Update $databases in settings.php
       lineinfile:
-        dest: "/var/www/html/sites/default/settings.php"
+        dest: "/var/www/web/sites/default/settings.php"
         regexp: "^\\$databases = \\[\\];"
         line: |
           $databases['default']['default'] = [
@@ -59,12 +59,12 @@
         - MYSQL_PASS is defined
     - name: Update $config_directories in settings.php
       lineinfile:
-        dest: "/var/www/html/sites/default/settings.php"
+        dest: "/var/www/web/sites/default/settings.php"
         regexp: "^\\$config_directories = \\[\\];"
         line: "$config_directories[CONFIG_SYNC_DIRECTORY] = '../config/sync';"
     - name: Update hash salt in settings.php
       lineinfile:
-        dest: "/var/www/html/sites/default/settings.php"
+        dest: "/var/www/web/sites/default/settings.php"
         regexp: "^\\$settings\\[\\'hash_salt\\'\\] = \\'\\';"
         line: "$settings['hash_salt'] = '{{ HASH_SALT | default(_default_hash_salt) }}';"
       vars:

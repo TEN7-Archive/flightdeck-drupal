@@ -1,4 +1,4 @@
-FROM ten7/flight-deck-web:7.4
+FROM ten7/flightdeck-web-7.4
 
 # Switch to root for the build.
 USER root
@@ -19,13 +19,19 @@ USER apache
 # build processes such as composer and gulp. You do *not* bake in
 # credentials here. That should be done in run.yml!
 #
-RUN git clone --branch 8.9.x --depth 1 https://git.drupalcode.org/project/drupal.git /var/www/html && \
-    rm -rf /var/www/html/.git && \
-    composer --working-dir=/var/www/html install && \
+RUN composer create-project drupal/recommended-project:9.2.0 /tmp/drupal && \
+    mv /tmp/drupal/composer* /var/www/ && \
+    mv /tmp/drupal/vendor /var/www/ && \
+    mv /tmp/drupal/web /var/www/ && \
+    composer --working-dir=/var/www install && \
     mkdir -m 755 -p /var/www/files /var/www/config/sync && \
-    ln -sfn /var/www/files /var/www/html/sites/default/files && \
-    cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php && \
-    chmod +w /var/www/html/sites/default/settings.php
+    ln -sfn /var/www/files /var/www/web/sites/default/files && \
+    cp /var/www/web/sites/default/default.settings.php /var/www/web/sites/default/settings.php && \
+    chmod +w /var/www/web/sites/default/settings.php && \
+    rm -rf /tmp/* /var/www/html
+
+# Override the default Flight Deck docroot directory
+ENV APACHE_DOCROOT_DIR /var/www/web
 
 # Expose port 80, 443
 EXPOSE 80 443
