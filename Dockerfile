@@ -1,10 +1,10 @@
-FROM ten7/flightdeck-web-7.4
+FROM ten7/flightdeck-web-8.0
 
 # Switch to root for the build.
 USER root
 
 # Copy the files needed by the site.
-COPY run.yml /ansible/run.yml
+COPY init.yml /ansible/init.yml
 
 # We need to reinvoke setcap to ensure HTTPD can run as non-root.
 RUN setcap cap_net_bind_service=+ep /usr/sbin/httpd
@@ -19,7 +19,7 @@ USER apache
 # build processes such as composer and gulp. You do *not* bake in
 # credentials here. That should be done in run.yml!
 #
-RUN composer create-project drupal/recommended-project:9.2.0 /tmp/drupal && \
+RUN composer create-project drupal/recommended-project:9.3.7 /tmp/drupal && \
     mv /tmp/drupal/composer* /var/www/ && \
     mv /tmp/drupal/vendor /var/www/ && \
     mv /tmp/drupal/web /var/www/ && \
@@ -35,5 +35,5 @@ RUN composer create-project drupal/recommended-project:9.2.0 /tmp/drupal && \
 # Override the default Flight Deck docroot directory
 ENV APACHE_DOCROOT_DIR /var/www/web
 
-# Expose port 80, 443
-EXPOSE 80 443
+# Expose port 80
+EXPOSE 80
