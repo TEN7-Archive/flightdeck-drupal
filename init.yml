@@ -10,10 +10,10 @@
 # pass to this playbook at: /config/web/flight-deck-web.yml
 #
 ---
-- hosts: flight-deck-web
+- hosts: flightdeck.localhost
   roles:
     # Sets up the container internally.
-    - flight-deck-web-run
+    - flightdeck-web-init
   tasks:
     # Grab key configurations from files.
     - name: Get the database name from file, if provided.
